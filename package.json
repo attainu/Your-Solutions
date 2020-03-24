@@ -1,18 +1,28 @@
 {
-  "name": "Your-Solutions",
+  "name": "your-solutions",
   "version": "1.0.0",
   "description": "Project by Rahul and Mohit",
-  "main": "index.js",
+  "main": "app.js",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/attainu/Your-Solutions.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Mohit Daswani & Rahul Ghimire",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/attainu/Your-Solutions/issues"
   },
