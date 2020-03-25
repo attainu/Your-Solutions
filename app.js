@@ -1,8 +1,11 @@
 const express = require("express")
 const app = express()
 const dotenv=require("dotenv")
+const morgan =require('morgan')
+const user=require('./Routes/userRoutes')
 dotenv.config()
 require("./db")
-
-
+app.use(morgan('dev'))
+app.use(express.json())
+app.use(user)
 module.exports=app
