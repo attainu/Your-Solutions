@@ -27,7 +27,7 @@ module.exports = {
             const { email, password } = req.body
             if (!email || !password)
                return res.status(400).send("Incorrect Credentials")
-            const user = await users.findByEmailAndPassword(email, password)
+            const user = await users.find_by_email_and_password(email, password)
             const accesToken = await user.generateToken()
             res.status(201).json({
                statusCode: 201,
@@ -48,15 +48,16 @@ module.exports = {
             if (!email || !password || !name)
                return res.status(400).send("ValidationError")
             const NewUser = await users.create(user)
+            NewUser.resetToken=null
             token = await NewUser.generateToken()
-            let subject=`Welcome to shubkadam.com` 
-            let text=`<h2>Thanks for Joining Us</h2>
+            let subject=`Welcome to ShubhKadam.com` 
+            let html=`<h2>Thanks for Joining Us</h2>
                         <h3>Dear ${name} you are one step closer to become one of our prestigious family</h3>
-                        <p>To verify your email Click <a href = "localhost:5555/user/verify/${token}">here</a></p> or 
-                        <p>copy paste this link to your browser:- <a href:"localhost:5555/user/verify/${token}">localhost:5555/user/verify/${token}</a>
+                        <p>To verify your email Click <a href=http://localhost:5555/user/verify/${token} >here</a></p> or 
+                        <p>click this link to your browser:- http://localhost:5555/user/verify/${token} </p>
                         <p>Thank you!!!!</p>`;
 
-            email1(email,subject,text)          //function to send email to the user
+            email1(email,subject,html)          //function to send email to the user
             
             res.status(201).json({
                statusCode: 201,
@@ -77,11 +78,11 @@ module.exports = {
       async forgot_password(req,res){
          try {
             let {email} = req.body
-            console.log(email)
-            let val1 = await users.find_by_email(email)
+            const user = await users.find_by_email(email)
+            const resetToken = await users.generate_reset_token(user)
             let subject=`Password Reset` 
-            let text=`<h2>shubkadam.com</h2>
-                        <h3>Dear ${val1[0].name}, Seems like you forgot your password for shubkadam.com account. if this is true, click below to reset your password.</h3>
+            let html=`<h2>ShubhKadam.com</h2>
+                        <h3>Dear ${user[0].name}, Seems like you forgot your password for ShubhKadam.com account. if this is true, click below to reset your password.</h3>
                         <button style="background-color: #338DFF; /* blue */
                         border: none;
                         color: white;
@@ -90,12 +91,12 @@ module.exports = {
                         display: inline-block;
                         font-size: 16px;
                         margin: 4px 2px;
-                        cursor: pointer;" onclick="document.location.href='localhost:5555/user/forgot_password/${val1[0]._id}'">Reset My Password</button> 
-                        <p>copy paste this link to your browser:- <a href="localhost:5555/user/forgot_password/${val1[0]._id}">localhost:5555/user/forgot_password/${val1[0]._id}</a>
+                        cursor: pointer;"><a href=http://localhost:5555/user/forgot_password/${resetToken}">Reset My Password</a></button> 
+                        <p>copy paste this link to your browser:- http://localhost:5555/user/forgot_password/${resetToken}
                         <p style="color:red;">If you did not forgot your password you can safely ignore this email.</p>
-                        <p>Thank you for choosing shubkadam.com</p>`;
-            email1(val1[0].email,subject,text)
-            res.status(200).json({statuscode: 200, message:`We have send a reset password email to ${val1[0].email}. Please click the reset password link to set a new password.`})            
+                        <p>Thank you for choosing ShubhKadam.com</p>`;
+            email1(user[0].email,subject,html)
+            res.status(200).json({statuscode: 200, message:`We have send a reset password email to ${user[0].email}. Please click the reset password link to set a new password.`})            
             
          } catch (err) {
             console.log(err.message)

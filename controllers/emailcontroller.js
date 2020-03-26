@@ -24,15 +24,15 @@ let transport=nodemailer.createTransport({
  }
  verify();
 
- let send_mail=async (email,subject,text)=>{
+ let send_mail=async (email,subject,html)=>{
     let status = await transport.sendMail({
-       from:`shubkadam.com`, 
+       from:`ShubhKadam.com`, 
        to:email,
        subject:subject,
-       html:text
+       html:html
     })
     try {
-       console.log(status)                  
+      //  console.log(status)                  
     } catch (err) {
        console.log(err)
     }

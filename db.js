@@ -9,7 +9,7 @@ let connect = async ()=>{
             useNewUrlParser:true
         })
         await console.log("db connected successfully")
-    }catch(error){
+    }catch(err){
         await console.log(err.message)
     }
 }

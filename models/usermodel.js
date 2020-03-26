@@ -7,10 +7,11 @@ let userSchema = new Schema({
   email: { type: String, trim: true, required: true, unique: true },
   password: { type: String, trim: true, required: true },
   token: { type: String, trim: true },
+  resetToken: { type: String, trim: true },
   verified:{type:Boolean,default:0}
 }, { timestamps: true });
 //-------------------------------------------------------------logic to find user by email and password 
-userSchema.statics.findByEmailAndPassword = async (email, password) => {
+userSchema.statics.find_by_email_and_password = async (email, password) => {
   try {
     const user = await User.findOne({ email: email });
     if (!user) throw new Error("Invalid Credentials");
@@ -44,11 +45,29 @@ userSchema.statics.find_by_email = async(email)=>{
 userSchema.methods.generateToken = async function(){
   try {
     const user = this
-    const token = await sign({ id: user._id }, process.env.SECRET_KEY, {
+    SECRET_KEY=`${user.email}-${new Date(user.createdAt).getTime()}`
+    const token = await sign({ id: user._id }, SECRET_KEY, {
       expiresIn: "30d"
     })
     user.token = token
     await user.save()
+    return token
+  }
+  catch (err) {
+    console.log(err.message)
+  }
+}
+//-------------------------------------------------------------------end
+//-------------------------------------------------------------logic to generate reset token 
+userSchema.statics.generate_reset_token = async function(user1){
+  try {
+    const user = user1
+    SECRET_KEY=`${user.email}-${new Date(user.createdAt).getTime()}`
+    const token = await sign({ id: user._id }, SECRET_KEY, {
+      expiresIn: "5m"
+    })
+    user[0].resetToken = token
+    user[0].save()
     return token
   }
   catch (err) {
