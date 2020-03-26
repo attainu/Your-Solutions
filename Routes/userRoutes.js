@@ -14,7 +14,7 @@ router.post("/user/login",post.login_user)
 router.post("/user/forgot_password",post.forgot_password)
 
 //-------------------------------------------------------Put Request Route
-router.put("/user/forgot_password/:id",put.forgot_password)
+router.put("/user/forgot_password/:resetToken",put.forgot_password)
 //-------------------------------------------------------Delete Request Route
 router.delete("/user/logout/:userToken",delete1.logout_user)
 

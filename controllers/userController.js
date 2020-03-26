@@ -1,5 +1,6 @@
 const users = require('../models/usermodel')
 const email1= require('./emailcontroller')
+const {verify}=require("jsonwebtoken")
 module.exports = {
    get:{
       async register_user(req, res) {
@@ -108,8 +109,21 @@ module.exports = {
    //----------------------------------------------------------------------------start of put request
    put:{ 
    async forgot_password(req,res){
-      console.log(req.params)
-      res.send('ok')
+      const {resetToken} =req.params
+      const {newpassword,cpassword}=req.body
+      if(newpassword!==cpassword) return res.send("Password doesnt match")
+      try {
+         const decoded =await verify(resetToken, process.env.secretkey)
+         if(decoded){  
+         const user = await users.find({resetToken:resetToken})
+         user[0].password=newpassword
+         user[0].save()
+         res.send("password successfully changed")
+         }
+         }
+         catch(err) {
+         console.log(err.message)
+       }
    }
 
 

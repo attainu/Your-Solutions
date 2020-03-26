@@ -1,6 +1,7 @@
 let mongoose = require('mongoose')
 const { compare, hash } = require("bcryptjs")
 const { sign } = require("jsonwebtoken")
+
 const Schema = mongoose.Schema;
 let userSchema = new Schema({
   name: { type: String, trim: true, required: true },
@@ -62,8 +63,8 @@ userSchema.methods.generateToken = async function(){
 userSchema.statics.generate_reset_token = async function(user1){
   try {
     const user = user1
-    SECRET_KEY=`${user.email}-${new Date(user.createdAt).getTime()}`
-    const token = await sign({ id: user._id }, SECRET_KEY, {
+
+    const token = await sign({ id: user._id }, process.env.secretkey, {
       expiresIn: "5m"
     })
     user[0].resetToken = token
