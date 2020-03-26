@@ -1,6 +1,7 @@
 const users = require('../models/usermodel')
 const email1= require('./emailcontroller')
 const {verify}=require("jsonwebtoken")
+const { validationResult}=require("express-validator")
 module.exports = {
    get:{
       async register_user(req, res) {
@@ -24,6 +25,7 @@ module.exports = {
    post: {
       //--------------------------------------------------------login user logic
       async login_user(req, res) {
+         
          try {
             const { email, password } = req.body
             if (!email || !password)
@@ -43,6 +45,12 @@ module.exports = {
       },
       //--------------------------------------------------------register user logic
       async register_user(req, res) {
+         {
+            // Finds the validation errors in this request and wraps them in an object with handy functions
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+              return res.status(422).json({ errors: errors.array() })
+            }
          try {
             let user = req.body
             const { email, password, name } = user
@@ -73,6 +81,7 @@ module.exports = {
                return res.status(400).send(`Validation Error: ${err.message}`);
             return res.status(500).send("Server Error");
          }
+      }
       },
       //----------------------------------------------------------------------------end
       //----------------------------------------------------------------------user forgot password logic
@@ -109,6 +118,12 @@ module.exports = {
    //----------------------------------------------------------------------------start of put request
    put:{ 
    async forgot_password(req,res){
+      {
+         // Finds the validation errors in this request and wraps them in an object with handy functions
+         const errors = validationResult(req)
+         if (!errors.isEmpty()) {
+           return res.status(422).json({ errors: errors.array() })
+         }
       const {resetToken} =req.params
       const {newpassword,cpassword}=req.body
       if(newpassword!==cpassword) return res.send("Password doesnt match")
@@ -124,6 +139,7 @@ module.exports = {
          catch(err) {
          console.log(err.message)
        }
+      }
    }
 
 
