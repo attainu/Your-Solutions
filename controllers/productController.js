@@ -1,5 +1,5 @@
-module.exports={
-   async registerUser (req,res) {
-       
+module.exports = {
+   async registerUser(req, res) {
+
    }
 }

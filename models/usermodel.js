@@ -9,7 +9,7 @@ let userSchema = new Schema({
   password: { type: String, trim: true, required: true },
   token: { type: String, trim: true },
   resetToken: { type: String, trim: true },
-  verified:{type:Boolean,default:0}
+  verified: { type: Boolean, default: 0 }
 }, { timestamps: true });
 //-------------------------------------------------------------logic to find user by email and password 
 userSchema.statics.find_by_email_and_password = async (email, password) => {
@@ -26,27 +26,26 @@ userSchema.statics.find_by_email_and_password = async (email, password) => {
 };
 //-------------------------------------------------------------------end
 //--------------------------------------------------------logic to find user by email
-userSchema.statics.find_by_email = async(email)=>{
-  try{
-    let temp1 = await User.find({email:email});
-    if(!temp1)
-    { 
+userSchema.statics.find_by_email = async (email) => {
+  try {
+    let temp1 = await User.find({ email: email });
+    if (!temp1) {
       return "Invalid Credentials";
     }
-    else{
+    else {
       return temp1
     }
-  } catch(err){
+  } catch (err) {
     err.name = 'AuthError';
     throw err;
   }
 }
 //-------------------------------------------------------------------end
 //-------------------------------------------------------------logic to generate token 
-userSchema.methods.generateToken = async function(){
+userSchema.methods.generateToken = async function () {
   try {
     const user = this
-    SECRET_KEY=`${user.email}-${new Date(user.createdAt).getTime()}`
+    SECRET_KEY = `${user.email}-${new Date(user.createdAt).getTime()}`
     const token = await sign({ id: user._id }, SECRET_KEY, {
       expiresIn: "30d"
     })
@@ -60,7 +59,7 @@ userSchema.methods.generateToken = async function(){
 }
 //-------------------------------------------------------------------end
 //-------------------------------------------------------------logic to generate reset token 
-userSchema.statics.generate_reset_token = async function(user1){
+userSchema.statics.generate_reset_token = async function (user1) {
   try {
     const user = user1
 
@@ -77,33 +76,33 @@ userSchema.statics.generate_reset_token = async function(user1){
 }
 //-------------------------------------------------------------------end
 //-----------------------------------------------------------logic to nullify token of a user 
-userSchema.statics.nullifyToken = async (token)=>{
-  try{
-    const user = await User.findOne({token:token})
-    user.token=null;
+userSchema.statics.nullifyToken = async (token) => {
+  try {
+    const user = await User.findOne({ token: token })
+    user.token = null;
     user.save()
     return user
   }
-  catch(err){
+  catch (err) {
     console.log(err.message)
   }
 }
 //-------------------------------------------------------------------end
 //-------------------------------------------------------------logic to verify user email 
-userSchema.statics.find_user_by_token = async(token)=>{
-  try{
-    const user = await User.findOne({token:token})
-    user.verified=true;
+userSchema.statics.find_user_by_token = async (token) => {
+  try {
+    const user = await User.findOne({ token: token })
+    user.verified = true;
     user.save()
     return user
   }
-  catch(err){
+  catch (err) {
     console.log(err.message)
   }
 }
 //---------------------------------------------------------------------end
 //-------------------------------------------------------------Pre middleware for hashing password
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
   const user = this;
   try {
     if (user.isModified("password")) {
