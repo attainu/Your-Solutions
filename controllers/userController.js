@@ -1,5 +1,5 @@
 const users = require('../models/usermodel')
-const email1= require('./emailcontroller')
+const email1= require('../utils/nodeMailer')
 const {verify}=require("jsonwebtoken")
 const { validationResult}=require("express-validator")
 module.exports = {
