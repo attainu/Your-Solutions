@@ -18,7 +18,15 @@ module.exports={
             if (err.message == "Invalid Credentials") return res.status(400).send("Invalid Credentials")
             return res.send("ServerError")
          }
-      }
+      },
+      async add_product(req,res){
+         try {
+            console.log(req.body)
+            res.send('ok')
+         } catch (err) {
+           console.log(err)
+         }
+      },
     },
     delete1:{
         async logout_admin(req,res){
