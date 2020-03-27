@@ -10,7 +10,7 @@ router.get("/user/verify/:token", get.verify_user_email)
 
 //-------------------------------------------------------Post Request Route
 router.post("/user/register", [
-    check('name').isAlpha().withMessage('Must be only alphabetical chars').isLength({ min: 3 }).withMessage('Must be at least 3 chars long'),
+    check('name').isLength({ min: 3 }).withMessage('Must be at least 3 chars long'),
     check('email').isEmail(),
     check('password').isAlphanumeric().withMessage('Must be only alphaNumeric chars').isLength({ min: 8 }).withMessage('Must be at least 8 chars long')
 ], post.register_user)
