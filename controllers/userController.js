@@ -31,11 +31,15 @@ module.exports = {
             if (!email || !password)
                return res.status(400).send("Incorrect Credentials")
             const user = await users.find_by_email_and_password(email, password)
+            if(user.verified===false){
+               return res.json({"message":"Please verify your email first"})
+            }else{
             const accesToken = await user.generateToken()
             res.status(201).json({
                statusCode: 201,
                token: accesToken
             })
+            }
          }
          catch (err) {
             console.log(err.message)
@@ -89,6 +93,10 @@ module.exports = {
          try {
             let { email } = req.body
             const user = await users.find_by_email(email)
+            if(user[0].verified===false){
+               return res.json({"message":"please verify your email first"})
+            }
+            else{
             const resetToken = await users.generate_reset_token(user)
             let subject = `Password Reset`
             let html = `<h2>ShubhKadam.com</h2>
@@ -107,6 +115,7 @@ module.exports = {
                         <p>Thank you for choosing ShubhKadam.com</p>`;
             email1(user[0].email, subject, html)
             res.status(200).json({ statuscode: 200, message: `We have send a reset password email to ${user[0].email}. Please click the reset password link to set a new password.` })
+            }
 
          } catch (err) {
             console.log(err.message)
