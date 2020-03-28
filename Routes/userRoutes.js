@@ -1,5 +1,4 @@
 const { get, post, put, delete1 } = require("../controllers/userController")
-// const controller=require("../controllers/userController")
 const { Router } = require("express")
 const router = Router()
 const { check} = require("express-validator")
