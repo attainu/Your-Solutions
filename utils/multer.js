@@ -1,5 +1,5 @@
 const multer=require('multer')
-
+const randomstring=require('randomstring')
 let storage = multer.diskStorage({
     //-------------------------------logic to upload images at destination
     destination: (req, file, cb)=>{
@@ -15,7 +15,7 @@ let storage = multer.diskStorage({
         // let year1 = temp.getFullYear()
         // let time1 = temp.getTime()
         // let value = date1+'-'+month1+'-'+year1+'-'+time1
-      cb(null, file.fieldname+'.'+val1[1] )
+      cb(null, file.fieldname+randomstring.generate(5)+'.'+val1[1] )
     }
   })
 

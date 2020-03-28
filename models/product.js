@@ -11,12 +11,12 @@ const productSchema = new Schema({
     color: { type: String, required: true },
     price: { type: Number, required: true },
     size: { type: Number, required: true },
-    // innerMaterial: { type: String },
-    // shoe_type: { type: String },
-    // upper_Material: { type: String },
+    inner_material: { type: String },
+    shoe_type: { type: String },
+    upper_material: { type: String },
     brand: { type: String, required: true },
-    // sole_material: { type: String },
-    // style_code: { type: Number },
+    sole_material: { type: String },
+    style_code: { type: Number },
 })
 productSchema.pre("remove", function (next) {
     const product = this

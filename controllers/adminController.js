@@ -29,54 +29,68 @@ module.exports={
       async add_product(req,res){
          try {
             let temp1 = req.body 
+            let img_url=[];
             console.log(req.headers.authorization)
             fs.readdir('uploads/',(err,data)=>{
                if(err){throw err}
-               let temp=data[0]
-               let img_url=undefined
-               if(temp=='product_img.jpg'){
-                  cloudinary.uploader.upload("uploads/product_img.jpg",(err,result)=>{if(err){throw err}
+               let temp=data
+               // console.log(temp)
+               img_url.length=0;
+               // console.log(temp.length)
+               for(let i=0;i<temp.length;i++){
+               if(/.jpg$/.test(temp[i])){
+                  // console.log(temp[i])
+                  cloudinary.uploader.upload(`uploads/${temp[i]}`,(err,result)=>{if(err){throw err}
                      else{
-                        // console.log(result)
-                        img_url=result.secure_url
-                        fs.unlink('uploads/product_img.jpg',(err)=>{if(err){throw err}else{console.log('deleted')}})
+                        // console.log(result.secure_url)
+                        img_url.push(result.secure_url)
+                        fs.unlink(`uploads/${temp[i]}`,(err)=>{if(err){throw err}else{console.log('deleted')}})
                   }});
                }
-               else if(temp=='product_img.jpeg'){
-                  cloudinary.uploader.upload("uploads/product_img.jpeg",(err,result)=>{if(err){throw err}
+               else if(/.jpeg$/.test(temp[i])){
+                  // console.log(temp[i])
+                  cloudinary.uploader.upload(`uploads/${temp[i]}`,(err,result)=>{if(err){throw err}
                      else{
-                        // console.log(result)
-                        img_url=result.secure_url
-                        fs.unlink('uploads/product_img.jpeg',(err)=>{if(err){throw err}else{console.log('deleted')}})
+                        // console.log(result.secure_url)
+                        img_url.push(result.secure_url)
+                        fs.unlink(`uploads/${temp[i]}`,(err)=>{if(err){throw err}else{console.log('deleted')}})
                   }});
                }
-               else if(temp=='product_img.png'){
-                  cloudinary.uploader.upload("uploads/product_img.png",(err,result)=>{if(err){throw err}
+               else if(/.png$/.test(temp[i])){
+                  // console.log(temp[i])
+                  cloudinary.uploader.upload(`uploads/${temp[i]}`,(err,result)=>{if(err){throw err}
                      else{
-                        // console.log(result)
-                        img_url=result.secure_url
-                        fs.unlink('uploads/product_img.png',(err)=>{if(err){throw err}else{console.log('deleted')}})
+                        // console.log(result.secure_url)
+                        img_url.push(result.secure_url)
+                        fs.unlink(`uploads/${temp[i]}`,(err)=>{if(err){throw err}else{console.log('deleted')}})
                   }});
                }
-               else if(temp=='product_img.webp'){
-                  cloudinary.uploader.upload("uploads/product_img.webp",(err,result)=>{if(err){throw err}
+               else if(/.webp$/.test(temp[i])){
+                  // console.log(temp[i])
+                  cloudinary.uploader.upload(`uploads/${temp[i]}`,(err,result)=>{if(err){throw err}
                      else{
-                        // console.log(result)
-                        img_url=result.secure_url
-                        fs.unlink('uploads/product_img.webp',(err)=>{if(err){throw err}else{console.log('deleted')}})
+                        // console.log(result.secure_url)
+                        img_url.push(result.secure_url)
+                        fs.unlink(`uploads/${temp[i]}`,(err)=>{if(err){throw err}else{console.log('deleted')}})
                   }});
                }
-               setTimeout(() => {
-                  // console.log(img_url)
-                  temp1.image_url1=img_url
-                  let newuser = product({...temp1})
-                  let data159 = async()=>{
-                     let val159=await newuser.save()
-                     await console.log(val159)
-                  }
-                  data159();
-               }, 3000);                  
+
+               }
+               // console.log('outside')                
             })
+            setTimeout(() => {
+               console.log(img_url)
+               temp1.image_url1=img_url[0]
+               temp1.image_url2=img_url[1]
+               temp1.image_url3=img_url[2]
+               temp1.image_url4=img_url[3]
+               let newuser = product({...temp1})
+               let data159 = async()=>{
+               let val159=await newuser.save()
+               await console.log(val159)
+            }
+            data159();
+         }, 10000);  
                      
             res.send('ok')
          } catch (err) {
