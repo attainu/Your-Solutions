@@ -7,10 +7,14 @@ const productSchema = new Schema({
     image_url2: { type: String },
     image_url3: { type: String },
     image_url4: { type: String },
-    // details: { type: String, required: true },
-    color: { type: String, required: true },
-    price: { type: Number, required: true },
-    size: { type: Number, required: true },
+    details: [{
+        size: { type: String, required: true },
+        price:{type:String,required:true},
+        colors: [{
+            color: { type: String, required: true },
+            quantity: { type: String, required: true }
+        }]
+    }],
     inner_material: { type: String },
     shoe_type: { type: String },
     upper_material: { type: String },

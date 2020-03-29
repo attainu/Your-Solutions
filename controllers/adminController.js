@@ -88,11 +88,12 @@ module.exports={
                let data159 = async()=>{
                let val159=await newuser.save()
                await console.log(val159)
+               res.json(val159)
             }
             data159();
          }, 10000);  
                      
-            res.send('ok')
+            // res.send(newuser)
          } catch (err) {
            console.log(err)
          }

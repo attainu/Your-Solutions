@@ -4,4 +4,5 @@ const router = Router()
 router.post("/review/:productId",post1.post_reviews)
 router.get("/shoes/product/:productId",get1.product_details)
 router.get("/shoes/:gender",get1.products_view)
+router.post("/user/addToCart/:productId",post1.add_to_cart)
 module.exports=router
