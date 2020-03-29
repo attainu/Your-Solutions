@@ -20,7 +20,7 @@ const productSchema = new Schema({
     upper_material: { type: String },
     brand: { type: String, required: true },
     sole_material: { type: String },
-    style_code: { type: Number },
+    style_code: { type: Number , unique:true},
 })
 productSchema.pre("remove", function (next) {
     const product = this

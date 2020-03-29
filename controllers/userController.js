@@ -78,9 +78,11 @@ module.exports = {
                })
             }
             catch (err) {
-               console.log(err.message)
-               if (err.name === "MongoError")
-                  return res.status(400).send(`Email already occupied`);
+               if (err.code === 11000){
+                  if(err.keyValue.hasOwnProperty('email')){
+                     return res.status(403).send(`Email already occupied`);
+                  }
+               }
                if (err.name === "ValidationError")
                   return res.status(400).send(`Validation Error: ${err.message}`);
                return res.status(500).send("Server Error");
