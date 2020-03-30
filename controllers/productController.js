@@ -5,33 +5,42 @@ const carts = require("../models/cart")
 
 module.exports = {
    get1: {
+      // ------------------to view products---------------
       async products_view(req, res) {
          const { gender } = req.params
          try {
             const all_products = await products.find({ gender: gender })
-
+            const user_review = await reviews.find({product_id:productId})
+            for (let i=0;i<user_review.length;i++){
+            review=user_review[i].review
+            reviewArray.push(review)
+            }
             await res.json(all_products)
          }
          catch (err) {
             console.log(err)
          }
       },
+// --------------------------to view the product detail and its review-----------------
       async product_details(req, res) {
          const { productId } = req.params
+         let reviewArray=[]
          try {
             const product = await products.find({ _id: productId })
-            // const user_review = await reviews.find({product_id:productId})
-            // await console.log(user_review)
-            // const{name,review}=user_review
-            // product.review={name:name,review:review}
-            // await product.save()
-            // console.log(product)
-            await res.json(product)
+            const user_review = await reviews.find({product_id:productId})
+            for (let i=0;i<user_review.length;i++){
+            const productReviewObj={review:user_review[i].review,
+            star:user_review[i].star
+            }
+            reviewArray.push(productReviewObj)
+            }
+            res.json({product:product,review:reviewArray})
          }
          catch (err) {
             console.log(err)
          }
       },
+      //--------------to view the cart page--------------
       async cartPage(req, res) {
          const { userId } = req.params
          const userCart = await carts.find({ user_id: userId })
@@ -50,7 +59,6 @@ module.exports = {
             }
             cartArray.push(newobj)
          }
-         // console.log(totalPrice)
          await res.json({products:cartArray,totalPrice:totalPrice})
       }
 
@@ -59,20 +67,18 @@ module.exports = {
    post1: {
       async post_reviews(req, res) {
          try {
-            const { review } = req.body
+            const { review,star } = req.body
             const { productId } = req.params
             const userToken = req.header('Authorization');
-
+            console.log(star)
             const user = await users.find_user_by_token(userToken)
             newReview = await reviews.create({
                userId: user._id,
                name: user.name,
                review: review,
+               star:star,
                product_id: productId
             })
-            // const product=await products.findOne({_id:productId})
-            // product.review=newReview
-            // product.save()
             newReview.save()
             console.log(newReview)
             res.json(newReview)
@@ -89,11 +95,11 @@ module.exports = {
             const { productId } = req.params
             const user = await users.find_user_by_token(userToken)
             const product = await products.find({ _id: productId })
-            let t = 0
+            let count3 = 0
             for (i = 0; i < product[0].details.length; i++) {
                if (product[0].details[i].size == size) {
-                  let u = 0
-                  let v = 0
+                  let count1 = 0
+                  let count2 = 0
                   for (j = 0; j < product[0].details[i].colors.length; j++) {
                      if (product[0].details[i].colors[j].color == color) {
                         if ((product[0].details[i].colors[j].quantity) >= quantity) {
@@ -108,25 +114,25 @@ module.exports = {
                         }
                         else {
                            console.log(quantity, product[0].details[i].colors[j].quantity)
-                           v = v + 1
+                           count2 = count2 + 1
                            continue
                         }
                      }
                      else {
-                        u = u + 1
+                        count1 = count1 + 1
                      }
                   }
 
-                  if (v > 0) return res.send(`out of stock`)
-                  if (u > product[0].details[i].colors.length - 1) return res.send(` ${color} color is not available right now, it will come soon`)
+                  if (count2 > 0) return res.send(`out of stock`)
+                  if (count1 > product[0].details[i].colors.length - 1) return res.send(` ${color} color is not available right now, it will come soon`)
 
                }
                else {
-                  t = t + 1
+                  count3 = count3 + 1
                   continue
                }
             }
-            if (t > product[0].details.length - 1) return res.send(`size ${size} is not available right now, it will come soon `)
+            if (count3 > product[0].details.length - 1) return res.send(`size ${size} is not available right now, it will come soon `)
          }
          catch (err) {
             console.log(err)
