@@ -10,11 +10,11 @@ module.exports = {
          const { gender } = req.params
          try {
             const all_products = await products.find({ gender: gender })
-            const user_review = await reviews.find({product_id:productId})
-            for (let i=0;i<user_review.length;i++){
-            review=user_review[i].review
-            reviewArray.push(review)
-            }
+            // const user_review = await reviews.find({product_id:productId})
+            // for (let i=0;i<user_review.length;i++){
+            // review=user_review[i].review
+            // reviewArray.push(review)
+            // }
             await res.json(all_products)
          }
          catch (err) {
