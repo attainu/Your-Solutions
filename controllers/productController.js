@@ -31,6 +31,27 @@ module.exports = {
          catch (err) {
             console.log(err)
          }
+      },
+      async cartPage(req, res) {
+         const { userId } = req.params
+         const userCart = await carts.find({ user_id: userId })
+         let totalPrice=0
+         let cartArray=[]
+         for (i = 0; i < userCart.length; i++) {
+            const productDetail = await products.find({ _id: userCart[i].product.product_id })
+            totalPrice=(userCart[i].product.price)+totalPrice
+            newobj = {
+               num: i+1,
+               image:productDetail[0].image_url1,
+               name:productDetail[0].name,
+               size:userCart[i].product.size,
+               quantity:userCart[i].product.quantity,
+               price:userCart[i].product.price,
+            }
+            cartArray.push(newobj)
+         }
+         // console.log(totalPrice)
+         await res.json({products:cartArray,totalPrice:totalPrice})
       }
 
 
@@ -68,47 +89,44 @@ module.exports = {
             const { productId } = req.params
             const user = await users.find_user_by_token(userToken)
             const product = await products.find({ _id: productId })
-            let t=0
-            // shoe =product[0].details.findInde({size:size}) 
-            // console.log(shoe)
-            // console.log(product[0].details[0].colors)
+            let t = 0
             for (i = 0; i < product[0].details.length; i++) {
                if (product[0].details[i].size == size) {
-                  let u=0
-                  let v=0
+                  let u = 0
+                  let v = 0
                   for (j = 0; j < product[0].details[i].colors.length; j++) {
-                     // console.log(product[0].details[i].colors[j].color)
                      if (product[0].details[i].colors[j].color == color) {
-                       
-                        if (quantity<=product[0].details[i].colors[j].quantity ) {
+                        if ((product[0].details[i].colors[j].quantity) >= quantity) {
+                           const price = (product[0].details[i].price) * quantity
                            const cart = {
                               user_id: user._id,
-                              product: { product_id: productId, size: size, color: color, quantity: quantity }
+                              product: { product_id: productId, size: size, color: color, quantity: quantity, price: price }
                            }
                            cart1 = await carts.create(cart)
                            await cart1.save()
-                           res.json(cart1)
+                           return res.json(cart1)
                         }
                         else {
-                           v=v+1
-                           break
-                        } 
+                           console.log(quantity, product[0].details[i].colors[j].quantity)
+                           v = v + 1
+                           continue
+                        }
                      }
                      else {
-                        u=u+1
+                        u = u + 1
                      }
                   }
-                
-                  if(v>0)return res.send(`There are only ${product[0].details[i].colors[j].quantity} pieces in stock`)
-                  if(u>product[0].details[i].colors.length-1)return res.send(` ${color} color is not available right now, it will come soon`)
 
-               } 
+                  if (v > 0) return res.send(`out of stock`)
+                  if (u > product[0].details[i].colors.length - 1) return res.send(` ${color} color is not available right now, it will come soon`)
+
+               }
                else {
-                  t=t+1
+                  t = t + 1
                   continue
                }
             }
-            if(t>product[0].details.length-1)  return res.send(`size ${size} is not available right now, it will come soon `)
+            if (t > product[0].details.length - 1) return res.send(`size ${size} is not available right now, it will come soon `)
          }
          catch (err) {
             console.log(err)

@@ -93,6 +93,7 @@ module.exports = {
          try {
             let { email } = req.body
             const user = await users.find_by_email(email)
+            
             if(user[0].verified===false){
                return res.json({"message":"please verify your email first"})
             }
