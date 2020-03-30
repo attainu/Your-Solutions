@@ -85,7 +85,7 @@ module.exports = {
       async add_to_cart(req, res) {
          try {
             const { size, color, quantity } = req.body
-            const userToken = req.header("Authorization")
+            const userToken = req.header("Authorization") //token validation is not done yet user must be validated first
             const { productId } = req.params
             const user = await users.find_user_by_token(userToken)
             const product = await products.find({ _id: productId })
