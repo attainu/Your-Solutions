@@ -8,7 +8,7 @@ let userSchema = new Schema({
   email: { type: String, trim: true, required: true, unique: true },
   password: { type: String, trim: true, required: true },
   token: { type: String, trim: true },
-  orders:[{type:Schema.Types.ObjectId}],
+  phoneNo:{type:String,required:true,unique:true},
   resetToken: { type: String, trim: true },
   verified: { type: Boolean, default: 0 }
 }, { timestamps: true });
