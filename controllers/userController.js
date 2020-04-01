@@ -1,6 +1,5 @@
 const users = require('../models/usermodel')
 const email1 = require('../utils/nodeMailer')
-const sendotp = require("../utils/smsOtp")
 const { verify } = require("jsonwebtoken")
 const { validationResult } = require("express-validator")
 module.exports = {
@@ -58,8 +57,8 @@ module.exports = {
             }
             try {
                let user = req.body
-               const { email, password, name,phoneNo } = user
-               if (!email || !password || !name || !phoneNo)
+               const { email, password, name } = user
+               if (!email || !password || !name)
                   return res.status(400).send("ValidationError")
                const NewUser = await users.create(user)
                NewUser.resetToken = null
@@ -72,10 +71,11 @@ module.exports = {
                         <p>Thank you!!!!</p>`;
 
                email1(email, subject, html)          //function to send email to the user
-               let id=await sendotp(email,phoneNo)
-           
 
-
+               res.status(201).json({
+                  statusCode: 201,
+                  NewUser
+               })
             }
             catch (err) {
                if (err.code === 11000){
@@ -125,14 +125,6 @@ module.exports = {
             res.status(500).send("server error")
          }
       },
-      // verify phone no. otp---------------------------------------
-      async verify_phoneNo_otp(req,res){
-         const userToken = req.header("Authorization")
-         const user = await users.find({token:userToken})
-         console.log(user)
-         const {otp}=req.body
-
-      }
       //----------------------------------------------------------------------------end
    },
    //----------------------------------------------------------------------------start of put request

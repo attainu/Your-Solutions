@@ -8,11 +8,9 @@ router.get("/user/verify/:token", get.verify_user_email)
 
 
 //-------------------------------------------------------Post Request Route
-router.post("/user/verifyOtp/:phoneNoId",post.verify_phoneNo_otp)
 router.post("/user/register", [
     check('name').isLength({ min: 3 }).withMessage('Must be at least 3 chars long'),
     check('email').isEmail(),
-    check("phoneNo").isLength(10).withMessage("phoneNo not valid"),
     check('password').isAlphanumeric().withMessage('Must be only alphaNumeric chars').isLength({ min: 8 }).withMessage('Must be at least 8 chars long')
 ], post.register_user)
 router.post("/user/login", post.login_user)

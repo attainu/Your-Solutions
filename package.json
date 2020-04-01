@@ -4,7 +4,6 @@
   "description": "Project by Rahul and Mohit",
   "main": "app.js",
   "dependencies": {
-    "authy": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.20.0",
     "cors": "^2.8.5",
