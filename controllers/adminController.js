@@ -27,7 +27,9 @@ module.exports = {
          try {
             let temp1 = req.body
             let img_url = [];
-            console.log(req.headers.authorization)
+            const adminToken = req.header("Authorization")
+            const admin = await admins.find({token:adminToken})
+            if(admin){
             fs.readdir('uploads/', (err, data) => {
                if (err) { throw err }
                let temp = data
@@ -81,11 +83,12 @@ module.exports = {
                let newuser = product({ ...temp1 })
                let data159 = async () => {
                   let val159 = await newuser.save()
-                  await console.log(val159)
                   res.json(val159)
                }
                data159();
             }, 10000);
+         }
+         else res.send("Kindly login first")
          } catch (err) {
             if(err==MongoError) return res.send("stylecode should be unique")
             console.log(err)

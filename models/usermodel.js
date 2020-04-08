@@ -5,12 +5,17 @@ const { sign } = require("jsonwebtoken")
 const Schema = mongoose.Schema;
 let userSchema = new Schema({
   name: { type: String, trim: true, required: true },
-  email: { type: String, trim: true, required: true, unique: true },
+  email: { type: String, trim: true,unique: true },
   password: { type: String, trim: true, required: true },
   token: { type: String, trim: true },
-  orders:[{type:Schema.Types.ObjectId}],
+  phoneNo:{type:String,unique:true},
   resetToken: { type: String, trim: true },
-  verified: { type: Boolean, default: 0 }
+  verified_email: { type: Boolean, default: 0 },
+  verified_mobile: { type: Boolean, default: 0 },
+  otp_id:{type:String},
+  googleid:{type:String},
+  facebookid:{type:String},
+  isthirdparty:{type:Boolean,default:0},
 }, { timestamps: true });
 //-------------------------------------------------------------logic to find user by email and password 
 userSchema.statics.find_by_email_and_password = async (email, password) => {
@@ -89,11 +94,26 @@ userSchema.statics.nullifyToken = async (token) => {
   }
 }
 //-------------------------------------------------------------------end
+//-----------------------------------------------------------logic to delete user by token  
+userSchema.statics.delete_user_by_token = async (token) => {
+  try {
+    const user = await User.findOne({ token: token })
+    if (user.isthirdparty === false) {
+      user.remove()
+      return user
+    }
+    return user
+  }
+  catch (err) {
+    console.log(err.message)
+  }
+}
+//-------------------------------------------------------------------end
 //-------------------------------------------------------------logic to verify user email 
 userSchema.statics.find_user_by_token = async (token) => {
   try {
     const user = await User.findOne({ token: token })
-    user.verified = true;
+    user.verified_email = true;
     user.save()
     return user
   }

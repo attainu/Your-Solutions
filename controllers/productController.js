@@ -1,7 +1,16 @@
+const randomstring = require("randomstring")
 const reviews = require("../models/review")
 const users = require("../models/usermodel")
 const products = require("../models/product")
+const payment1 = require("../models/payment")
 const carts = require("../models/cart")
+const Razorpay = require('razorpay')
+let val = undefined
+let { RAZOR_PAY_KEY_ID, RAZOR_PAY_SECRET } = process.env
+let instance = new Razorpay({
+   key_id: RAZOR_PAY_KEY_ID,
+   key_secret: RAZOR_PAY_SECRET
+})
 
 module.exports = {
    get1: {
@@ -21,20 +30,22 @@ module.exports = {
             console.log(err)
          }
       },
-// --------------------------to view the product detail and its review-----------------
+      // --------------------------to view the product detail and its review-----------------
       async product_details(req, res) {
          const { productId } = req.params
-         let reviewArray=[]
+         let reviewArray = []
          try {
             const product = await products.find({ _id: productId })
-            const user_review = await reviews.find({product_id:productId})
-            for (let i=0;i<user_review.length;i++){
-            const productReviewObj={review:user_review[i].review,
-            star:user_review[i].star
+            const user_review = await reviews.find({ product_id: productId })
+            for (let i = 0; i < user_review.length; i++) {
+               const productReviewObj = {
+                  name: user_review[i].name,
+                  review: user_review[i].review,
+                  star: user_review[i].star
+               }
+               reviewArray.push(productReviewObj)
             }
-            reviewArray.push(productReviewObj)
-            }
-            res.json({product:product,review:reviewArray})
+            res.json({ product: product, review: reviewArray })
          }
          catch (err) {
             console.log(err)
@@ -44,44 +55,72 @@ module.exports = {
       async cartPage(req, res) {
          const { userId } = req.params
          const userCart = await carts.find({ user_id: userId })
-         let totalPrice=0
-         let cartArray=[]
+
+         let totalPrice = 0
+         let cartArray = []
          for (i = 0; i < userCart.length; i++) {
             const productDetail = await products.find({ _id: userCart[i].product.product_id })
-            totalPrice=(userCart[i].product.price)+totalPrice
+            totalPrice = (userCart[i].product.price) + totalPrice
             newobj = {
-               num: i+1,
-               image:productDetail[0].image_url1,
-               name:productDetail[0].name,
-               size:userCart[i].product.size,
-               quantity:userCart[i].product.quantity,
-               price:userCart[i].product.price,
+               num: i + 1,
+               image: productDetail[0].image_url1,
+               name: productDetail[0].name,
+               size: userCart[i].product.size,
+               quantity: userCart[i].product.quantity,
+               price: userCart[i].product.price,
             }
             cartArray.push(newobj)
          }
-         await res.json({products:cartArray,totalPrice:totalPrice})
-      }
-
-
+         await res.json({ products: cartArray, totalPrice: totalPrice })
+      },
+      // ----------------to sort the product------------------
+      async sort_the_product(req, res) {
+         try {
+            const { gender } = req.params
+            const { value, size } = req.body
+            if (value == "ascending_date") {
+               const all_products = await products.find({ gender: gender }).sort({ createdAt: 1 })
+               res.send(all_products)
+            }
+            else if (value == "descending_date") {
+               const all_products = await products.find({ gender: gender }).sort({ createdAt: -1 })
+               res.send(all_products)
+            }
+            else if (value == "high_price") {
+               const all_products = await products.find({ gender: gender }).sort({ "details.price": -1 })
+               res.send(all_products)
+            }
+            else if (value == "low_price") {
+               const all_products = await products.find({ gender: gender }).sort({ "details.price": 1 })
+               res.send(all_products)
+            }
+            else if (size) {
+               const all_products = await products.find({ "details.size": size })
+               if (all_products.length == 0) return res.send(`product of size ${size} is not available right now..come again later `)
+               res.send(all_products)
+            }
+         }
+         catch (err) {
+            console.log(err.message)
+            res.send("serverError")
+         }
+      },
    },
    post1: {
       async post_reviews(req, res) {
          try {
-            const { review,star } = req.body
+            const { review, star } = req.body
             const { productId } = req.params
-            const userToken = req.header('Authorization');
-            console.log(star)
-            const user = await users.find_user_by_token(userToken)
+            const user = req.user
             newReview = await reviews.create({
                userId: user._id,
                name: user.name,
                review: review,
-               star:star,
+               star: star,
                product_id: productId
             })
             newReview.save()
-            console.log(newReview)
-            res.json(newReview)
+            res.status(201).json({ statusCode: 200, newReview })
          }
          catch (err) {
             console.log(err.message)
@@ -91,9 +130,8 @@ module.exports = {
       async add_to_cart(req, res) {
          try {
             const { size, color, quantity } = req.body
-            const userToken = req.header("Authorization") //token validation is not done yet user must be validated first
+            const user = req.user
             const { productId } = req.params
-            const user = await users.find_user_by_token(userToken)
             const product = await products.find({ _id: productId })
             let count3 = 0
             for (i = 0; i < product[0].details.length; i++) {
@@ -139,6 +177,48 @@ module.exports = {
          }
 
 
+      },
+      async generate_order(req, res) {
+         try {
+            let user = req.user
+            // console.log(user)
+            let temp = req.body
+            let options = {
+               amount: temp.amount,  // amount in the smallest currency unit
+               currency: "INR",
+               receipt: randomstring.generate(7),
+               payment_capture: 1
+            };
+            instance.orders.create(options, (err, order) => {
+               if (err) throw err
+               // console.log(order);
+               val = order;
+            }).then(() => {
+               let paymentobj = {
+                  user_id: user._id,
+                  order_id: val.id,
+                  razor_payment_id:null,
+                  razor_signature:null
+               }
+               let yahoo = async ()=>{
+                  let order = await payment1.create(paymentobj)
+                  order.save()
+                  res.send(val)
+               }
+               yahoo()
+            })
+         } catch (err) {
+            console.log(err)
+         }
+      },
+      async razor_pay_success(req, res) {
+         console.log(req.body)
+         const {razorpay_payment_id,razorpay_order_id,razorpay_signature}=req.body
+         const success=await payment1.find({order_id:razorpay_order_id})
+         console.log(success)
+         success.razor_payment_id=razorpay_payment_id
+         success.razor_signature=razorpay_signature
+         await success.Update()                       // yaha se kaam karna sirf save karna hai 
       }
    }
 }

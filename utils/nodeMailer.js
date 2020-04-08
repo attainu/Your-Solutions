@@ -2,6 +2,7 @@ const nodemailer=require('nodemailer')
 const dotenv=require('dotenv')
 dotenv.config()
 
+
 let transport=nodemailer.createTransport({
     host:"smtp.gmail.com",
     port:465,
