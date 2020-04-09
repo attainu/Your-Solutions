@@ -5,6 +5,7 @@ const fs = require('fs')
 const cloudinary = require('../utils/cloudinary')
 module.exports = {
    post: {
+      // -------------------------------admin login---------------
       async login_admin(req, res) {
          try {
             const { email, password } = req.body
@@ -23,6 +24,7 @@ module.exports = {
             return res.send("ServerError")
          }
       },
+      // -------------------products added by admin
       async add_product(req, res) {
          try {
             let temp1 = req.body
@@ -96,6 +98,7 @@ module.exports = {
          }
       },
    },
+   // -----------------------admin logout--------------
    delete1: {
       async logout_admin(req, res) {
          try {

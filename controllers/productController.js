@@ -17,13 +17,11 @@ module.exports = {
       // ------------------to view products---------------
       async products_view(req, res) {
          const { gender } = req.params
+         const {page}=req.query
+         const perPage = 2
+         let current_page = Math.max(0, page)
          try {
-            const all_products = await products.find({ gender: gender })
-            // const user_review = await reviews.find({product_id:productId})
-            // for (let i=0;i<user_review.length;i++){
-            // review=user_review[i].review
-            // reviewArray.push(review)
-            // }
+            const all_products = await products.find({ gender: gender }).skip(perPage*current_page).limit(perPage)
             await res.json(all_products)
          }
          catch (err) {
@@ -181,7 +179,6 @@ module.exports = {
       async generate_order(req, res) {
          try {
             let user = req.user
-            // console.log(user)
             let temp = req.body
             let options = {
                amount: temp.amount,  // amount in the smallest currency unit
@@ -214,11 +211,7 @@ module.exports = {
       async razor_pay_success(req, res) {
          console.log(req.body)
          const {razorpay_payment_id,razorpay_order_id,razorpay_signature}=req.body
-         const success=await payment1.find({order_id:razorpay_order_id})
-         console.log(success)
-         success.razor_payment_id=razorpay_payment_id
-         success.razor_signature=razorpay_signature
-         await success.Update()                       // yaha se kaam karna sirf save karna hai 
+         await payment1.findOneAndUpdate({order_id:razorpay_order_id}, {$set:{razor_payment_id:razorpay_payment_id,razor_signature:razorpay_signature}},{new:true})
       }
    }
 }
